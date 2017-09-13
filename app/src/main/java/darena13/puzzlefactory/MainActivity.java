@@ -51,11 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
                     return true;
                 case MotionEvent.ACTION_MOVE:
-
                     if (!(direction == null)) {
                         switch (direction) {
                             case HRZ:
-                                presenter.hSlowMove(startPoint);
+                                presenter.hSlowMove(startPoint, (int) eventX, (int) eventY);
                                 break;
                             case VRT:
                                 presenter.vSlowMove(startPoint);
@@ -64,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     } else if (Math.sqrt(eventX * eventX + eventY * eventY) > 50) {
                         if (Math.abs(eventX - startPoint.x) > Math.abs(eventY - startPoint.y)) {
                             direction = Direction.HRZ;
+                            presenter.chosenLineH(startPoint);
                         } else {
                             direction = Direction.VRT;
                         }

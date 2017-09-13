@@ -14,18 +14,25 @@ import android.view.WindowManager;
  */
 
 public class PlayActivityPresenter implements PlayGround {
-    int numberOfRects;
-    Display display;
-    Point dSize;
-    int rectSize;
-    Rect[][] pictureRects;
+    private int numberOfRects;
+    private Display display;
+    private Point dSize;
+    private int rectSize;
+    private Rect[][] pictureRects;
 
-    Paint[][] paints;
+    private Paint[][] paints;
+
     @ColorInt
-    int topLeftColor;
-    int topRightColor;
-    int bottomRightColor;
-    int bottomLeftColor;
+    private int topLeftColor;
+    private int topRightColor;
+    private int bottomRightColor;
+    private int bottomLeftColor;
+
+    //    Rect rectToRotate;
+    private Rect[] rectsToRotate;
+
+    private int[] rectsLeftsOnStart;
+    private int[] rectsRightsOnStart;
 
     public PlayActivityPresenter(Context context) {
         this.numberOfRects = 7;
@@ -48,17 +55,45 @@ public class PlayActivityPresenter implements PlayGround {
         dSize = new Point();
         display.getSize(dSize);
         rectSize = dSize.x / numberOfRects;
+
+//        rectToRotate = new Rect(100, 100, 200, 200);
+        rectsToRotate = new Rect[numberOfRects];
+
+        rectsLeftsOnStart = new int[numberOfRects];
+        rectsRightsOnStart = new int[numberOfRects];
+    }
+
+    public void chosenLineH(Point startPoint) {
+        int yIndex = startPoint.y / rectSize;
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            rectsToRotate[i] = pictureRects[yIndex][i];
+        }
+
+        for (int i = 0; i < rectsLeftsOnStart.length; i++) {
+            rectsLeftsOnStart[i] = rectsToRotate[i].left;
+        }
+
+        for (int i = 0; i < rectsRightsOnStart.length; i++) {
+            rectsRightsOnStart[i] = rectsToRotate[i].right;
+        }
+
+//        rectToRotate.set(0, rectSize*yIndex, rectSize*numberOfRects, rectSize*(yIndex+1));
     }
 
     @Override
-    public void hSlowMove(Point startPoint) {
-        int xIndex = startPoint.x / rectSize;
-        int yIndex = startPoint.y / rectSize;
+    public void hSlowMove(Point startPoint, int eventX, int eventY) {
+//        rectToRotate.set(eventX - rectSize/2, rectToRotate.top, eventX + rectSize/2, rectToRotate.bottom);
+
+        int projOnX = eventX - startPoint.x;
+
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            rectsToRotate[i].set(rectsLeftsOnStart[i] + projOnX, rectsToRotate[i].top, rectsRightsOnStart[i] + projOnX, rectsToRotate[i].bottom);
+        }
     }
 
     @Override
     public void vSlowMove(Point startPoint) {
-
+//        int xIndex = startPoint.x / rectSize;
     }
 
     @Override
@@ -95,5 +130,11 @@ public class PlayActivityPresenter implements PlayGround {
                 canvas.drawRect(pictureRects[i][j], paints[i][j]);
             }
         }
+        if (!(rectsToRotate[0] == null)) {
+            for (int i = 0; i < rectsToRotate.length; i++) {
+                canvas.drawRect(rectsToRotate[i], paints[i][0]); //придумать как взять нужные пейнты
+            }
+        }
+//        canvas.drawRect(rectToRotate, paints[0][0]);
     }
 }

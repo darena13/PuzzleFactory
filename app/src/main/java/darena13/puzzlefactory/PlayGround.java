@@ -8,7 +8,7 @@ import android.graphics.Point;
  */
 
 public interface PlayGround {
-    void hSlowMove(Point startPoint);
+    void hSlowMove(Point startPoint, int eventX, int eventY);
     void vSlowMove(Point startPoint);
     void setColorsToPaints();
     void setXYToRects();
