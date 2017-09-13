@@ -28,11 +28,11 @@ public class PlayActivityPresenter implements PlayGround {
     private int bottomRightColor;
     private int bottomLeftColor;
 
-    //    Rect rectToRotate;
     private Rect[] rectsToRotate;
 
     private int[] rectsLeftsOnStart;
     private int[] rectsRightsOnStart;
+    private Paint[] paintsToRotate;
 
     public PlayActivityPresenter(Context context) {
         this.numberOfRects = 7;
@@ -56,36 +56,56 @@ public class PlayActivityPresenter implements PlayGround {
         display.getSize(dSize);
         rectSize = dSize.x / numberOfRects;
 
-//        rectToRotate = new Rect(100, 100, 200, 200);
-        rectsToRotate = new Rect[numberOfRects];
+        rectsToRotate = new Rect[numberOfRects + 2];
 
-        rectsLeftsOnStart = new int[numberOfRects];
-        rectsRightsOnStart = new int[numberOfRects];
+        rectsLeftsOnStart = new int[numberOfRects + 2];
+        rectsRightsOnStart = new int[numberOfRects + 2];
+
+        paintsToRotate = new Paint[numberOfRects + 2];
     }
 
     public void chosenLineH(Point startPoint) {
+        //вычисляем какую строчку двигать
         int yIndex = startPoint.y / rectSize;
-        for (int i = 0; i < rectsToRotate.length; i++) {
-            rectsToRotate[i] = pictureRects[yIndex][i];
+        //копируем прямоугольники из строчки в новый массив
+        for (int i = 1; i < rectsToRotate.length - 1; i++) {
+            rectsToRotate[i] = pictureRects[yIndex][i - 1];
         }
-
+        //добавляем прямоугольник в начало строчки
+        rectsToRotate[0] = new Rect(
+                rectsToRotate[1].left - rectSize,
+                rectsToRotate[1].top,
+                rectsToRotate[1].right - rectSize,
+                rectsToRotate[1].bottom);
+        //и в конец
+        rectsToRotate[rectsToRotate.length - 1] = new Rect(
+                rectsToRotate[rectsToRotate.length - 2].left + rectSize,
+                rectsToRotate[rectsToRotate.length - 2].top,
+                rectsToRotate[rectsToRotate.length - 2].right + rectSize,
+                rectsToRotate[rectsToRotate.length - 2].bottom);
+        //запоминаем исходные координаты прямоугольников
         for (int i = 0; i < rectsLeftsOnStart.length; i++) {
             rectsLeftsOnStart[i] = rectsToRotate[i].left;
         }
-
         for (int i = 0; i < rectsRightsOnStart.length; i++) {
             rectsRightsOnStart[i] = rectsToRotate[i].right;
         }
+        //заполняем массив красок для прямоугольников
+        for (int i = 1; i < paintsToRotate.length - 1; i++) {
+            paintsToRotate[i] = paints[yIndex][i - 1];
+        }
+        paintsToRotate[0] = paintsToRotate[paintsToRotate.length - 2];
+        paintsToRotate[paintsToRotate.length - 1] = paintsToRotate[1];
+        if (rectsToRotate[rectsToRotate.length - 1].left == dSize.x) {
 
-//        rectToRotate.set(0, rectSize*yIndex, rectSize*numberOfRects, rectSize*(yIndex+1));
+        }
     }
 
     @Override
     public void hSlowMove(Point startPoint, int eventX, int eventY) {
-//        rectToRotate.set(eventX - rectSize/2, rectToRotate.top, eventX + rectSize/2, rectToRotate.bottom);
-
+        //расстояние по горизонтали
         int projOnX = eventX - startPoint.x;
-
+        //двигаем на это расстояние
         for (int i = 0; i < rectsToRotate.length; i++) {
             rectsToRotate[i].set(rectsLeftsOnStart[i] + projOnX, rectsToRotate[i].top, rectsRightsOnStart[i] + projOnX, rectsToRotate[i].bottom);
         }
@@ -93,7 +113,7 @@ public class PlayActivityPresenter implements PlayGround {
 
     @Override
     public void vSlowMove(Point startPoint) {
-//        int xIndex = startPoint.x / rectSize;
+
     }
 
     @Override
@@ -117,24 +137,17 @@ public class PlayActivityPresenter implements PlayGround {
 
     @Override
     public void drawRects(Canvas canvas) {
-//        int paintsCount = 0;
-//        for (Rect[] pictureRect : pictureRects) {
-//            for (Rect rect : pictureRect) {
-//                canvas.drawRect(rect, paints[paintsCount % paints.length]);
-//                paintsCount++;
-//
-//            }
-//        }
+        //рисуем все прямоугольники
         for (int i = 0; i < pictureRects.length; i++) {
             for (int j = 0; j < pictureRects[i].length; j++) {
                 canvas.drawRect(pictureRects[i][j], paints[i][j]);
             }
         }
+        //рисуем выбранную линию
         if (!(rectsToRotate[0] == null)) {
             for (int i = 0; i < rectsToRotate.length; i++) {
-                canvas.drawRect(rectsToRotate[i], paints[i][0]); //придумать как взять нужные пейнты
+                canvas.drawRect(rectsToRotate[i], paintsToRotate[i]);
             }
         }
-//        canvas.drawRect(rectToRotate, paints[0][0]);
     }
 }
