@@ -1,5 +1,6 @@
 package darena13.puzzlefactory;
 
+import android.graphics.Canvas;
 import android.graphics.Point;
 
 /**
@@ -7,6 +8,9 @@ import android.graphics.Point;
  */
 
 public interface PlayGround {
-    public void hSlowMove(Point startPoint, int rectSize);
-    public void vSlowMove(Point startPoint, int rectSize);
+    void hSlowMove(Point startPoint);
+    void vSlowMove(Point startPoint);
+    void setColorsToPaints();
+    void setXYToRects();
+    void drawRects(Canvas canvas);
 }
