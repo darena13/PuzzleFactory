@@ -5,7 +5,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.provider.Settings;
 import android.support.annotation.ColorInt;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
@@ -14,6 +16,8 @@ import android.view.WindowManager;
  */
 
 public class PlayActivityPresenter implements PlayGround {
+    private static final String TAG = "CL Presenter";
+
     private int numberOfRects;
     private Display display;
     private Point dSize;
@@ -34,7 +38,9 @@ public class PlayActivityPresenter implements PlayGround {
     private int[] rectsRightsOnStart;
     private Paint[] paintsToRotate;
 
-    public PlayActivityPresenter(Context context) {
+    int yIndex;
+
+    PlayActivityPresenter(Context context) {
         this.numberOfRects = 7;
         topLeftColor = 0xfffb9908;
         topRightColor = 0xff177a27;
@@ -62,18 +68,15 @@ public class PlayActivityPresenter implements PlayGround {
         rectsRightsOnStart = new int[numberOfRects * 3];
 
         paintsToRotate = new Paint[numberOfRects * 3];
+
+//        yIndex = 0;
     }
 
-    public void chosenLineH(Point startPoint) {
+    public void hChoseLineToRotate(Point startPoint) {
         //вычисляем какую строчку двигать
-        int yIndex = startPoint.y / rectSize;
-        //копируем прямоугольники из строчки в новый массив три раза
-//        System.arraycopy(pictureRects[yIndex], 0, rectsToRotate, 0, pictureRects[yIndex].length);
-//        System.arraycopy(pictureRects[yIndex], 0, rectsToRotate, numberOfRects, pictureRects[yIndex].length);
-//        System.arraycopy(pictureRects[yIndex], 0, rectsToRotate, numberOfRects * 2, pictureRects[yIndex].length);
-
+        yIndex = startPoint.y / rectSize;
         //заполняем центральную часть копиями прямоугольников из исходной строчки
-        for (int i = numberOfRects; i < pictureRects[yIndex].length; i++) {
+        for (int i = numberOfRects; i < numberOfRects * 2; i++) {
             rectsToRotate[i] = new Rect(
                     pictureRects[yIndex][i - numberOfRects].left,
                     pictureRects[yIndex][i - numberOfRects].top,
@@ -82,7 +85,7 @@ public class PlayActivityPresenter implements PlayGround {
             );
         }
         //заполняем левую часть копиями прямоугольников из исходной строчки со смещением
-        for (int i = 0; i < pictureRects[yIndex].length; i++) {
+        for (int i = 0; i < numberOfRects; i++) {
             rectsToRotate[i] = new Rect(
                     pictureRects[yIndex][i].left - numberOfRects * rectSize,
                     pictureRects[yIndex][i].top,
@@ -91,12 +94,12 @@ public class PlayActivityPresenter implements PlayGround {
             );
         }
         //заполняем правую часть копиями прямоугольников из исходной строчки со смещением
-        for (int i = numberOfRects * 2 + 1; i < pictureRects[yIndex].length; i++) {
+        for (int i = numberOfRects * 2; i < numberOfRects * 3; i++) {
             rectsToRotate[i] = new Rect(
-                    pictureRects[yIndex][i - (numberOfRects * 2 + 1)].left + numberOfRects * rectSize,
-                    pictureRects[yIndex][i - (numberOfRects * 2 + 1)].top,
-                    pictureRects[yIndex][i - (numberOfRects * 2 + 1)].right + numberOfRects * rectSize,
-                    pictureRects[yIndex][i - (numberOfRects * 2 + 1)].bottom
+                    pictureRects[yIndex][i - (numberOfRects * 2)].left + numberOfRects * rectSize,
+                    pictureRects[yIndex][i - (numberOfRects * 2)].top,
+                    pictureRects[yIndex][i - (numberOfRects * 2)].right + numberOfRects * rectSize,
+                    pictureRects[yIndex][i - (numberOfRects * 2)].bottom
             );
         }
         //запоминаем исходные координаты прямоугольников
@@ -110,14 +113,11 @@ public class PlayActivityPresenter implements PlayGround {
         System.arraycopy(paints[yIndex], 0, paintsToRotate, 0, paints[yIndex].length);
         System.arraycopy(paints[yIndex], 0, paintsToRotate, numberOfRects, paints[yIndex].length);
         System.arraycopy(paints[yIndex], 0, paintsToRotate, numberOfRects * 2, paints[yIndex].length);
-
-//        paintsToRotate[0] = paintsToRotate[paintsToRotate.length - 2];
-//        paintsToRotate[paintsToRotate.length - 1] = paintsToRotate[1];
-
+        Log.v(TAG, "hLine is chosen");
     }
 
     @Override
-    public void hSlowMove(Point startPoint, int eventX, int eventY) {
+    public void hSlowMove(Point startPoint, int eventX) {
         //расстояние по горизонтали
         int projOnX = eventX - startPoint.x;
         //двигаем на это расстояние
@@ -127,9 +127,47 @@ public class PlayActivityPresenter implements PlayGround {
     }
 
     @Override
-    public void vSlowMove(Point startPoint) {
+    public void hPutRectsInPlace() {
+        //выравниваем прямоугольники по сетке
+        if (rectsToRotate[0].left % rectSize < rectSize / 2) {
+            for (Rect rect : rectsToRotate) {
+                int newLeft = rectSize * (rect.left / rectSize);
+                int newRight = rectSize * (rect.right / rectSize);
+                rect.set(newLeft, rect.top, newRight, rect.bottom);
+            }
+        } else {
+            for (Rect rect : rectsToRotate) {
+                int newLeft = (rectSize + 1) * (rect.left / rectSize);
+                int newRight = (rectSize + 1) * (rect.right / rectSize);
+                rect.set(newLeft, rect.top, newRight, rect.bottom);
+            }
+        }
+        //копируем видимые прямоугольники в основной массив
+        //узнать самый левый прямоугольник
+        int mostLeftIndex = 0;
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            if (rectsToRotate[i].left == 0) {
+                mostLeftIndex = i;
+                Log.v(TAG, "mostLeftIndex = " + mostLeftIndex);
+                break;
+            }
+        }
+        //скопировать от него 
+        System.arraycopy(rectsToRotate, mostLeftIndex, pictureRects[yIndex], 0, numberOfRects);
+    }
+
+    @Override
+    public void vChoseLineToRotate(Point startPoint) {
+
+    };
+
+    @Override
+    public void vSlowMove(Point startPoint, int eventY) {
 
     }
+
+    @Override
+    public void vPutRectsInPlace() {}
 
     @Override
     public void setXYToRects() {

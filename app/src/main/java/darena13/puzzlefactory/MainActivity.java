@@ -6,11 +6,12 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "COLORLOVERS";
+    private static final String TAG = "COLORLOVERS Main";
     PlayActivityPresenter presenter;
 
     @Override
@@ -51,30 +52,37 @@ public class MainActivity extends AppCompatActivity {
 
                     return true;
                 case MotionEvent.ACTION_MOVE:
+
                     if (!(direction == null)) {
                         switch (direction) {
                             case HRZ:
-                                presenter.hSlowMove(startPoint, (int) eventX, (int) eventY);
+                                presenter.hSlowMove(startPoint, (int) eventX);
                                 break;
                             case VRT:
-                                presenter.vSlowMove(startPoint);
+                                presenter.vSlowMove(startPoint, (int) eventY);
                                 break;
                         }
                     } else if (Math.sqrt(eventX * eventX + eventY * eventY) > 50) {
                         if (Math.abs(eventX - startPoint.x) > Math.abs(eventY - startPoint.y)) {
                             direction = Direction.HRZ;
-                            presenter.chosenLineH(startPoint);
+                            Log.v(TAG, "HRZ");
+                            presenter.hChoseLineToRotate(startPoint);
                         } else {
                             direction = Direction.VRT;
+                            Log.v(TAG, "VRT");
+                            presenter.hChoseLineToRotate(startPoint); //заменить таким же, но вертикальным
                         }
                     }
 
                     break;
                 case MotionEvent.ACTION_UP:
-
-                    //ставим строку/столбик на место
+                    if (direction == Direction.HRZ) {
+                        presenter.hPutRectsInPlace();
+                    } else {
+                        presenter.vPutRectsInPlace();
+                    }
                     direction = null;
-
+//Switch is no bro. Also why always VRT? And mostLeftIndex is broken.
                     break;
                 default:
                     return false;
