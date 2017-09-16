@@ -37,9 +37,12 @@ public class PlayActivityPresenter implements PlayGround {
 
     private int[] rectsLeftsOnStart;
     private int[] rectsRightsOnStart;
+    private int[] rectsTopsOnStart;
+    private int[] rectsBottomsOnStart;
     private Paint[] paintsToRotate;
 
     int yIndex;
+    int xIndex;
 
     PlayActivityPresenter(Context context) {
         this.numberOfRects = 7;
@@ -67,10 +70,14 @@ public class PlayActivityPresenter implements PlayGround {
 
         rectsLeftsOnStart = new int[numberOfRects * 3];
         rectsRightsOnStart = new int[numberOfRects * 3];
+        rectsTopsOnStart = new int[numberOfRects * 3];
+        rectsBottomsOnStart = new int[numberOfRects * 3];
 
         paintsToRotate = new Paint[numberOfRects * 3];
     }
 
+    //HORIZONTAL
+    @Override
     public void hChoseLineToRotate(Point startPoint) {
         //вычисляем какую строчку двигать
         if (startPoint.y < numberOfRects * rectSize) {
@@ -161,20 +168,105 @@ public class PlayActivityPresenter implements PlayGround {
         System.arraycopy(paintsToRotate, mostLeftIndex, paints[yIndex], 0, numberOfRects);
     }
 
+    //VERTICAL
     @Override
     public void vChoseLineToRotate(Point startPoint) {
-
+        //вычисляем какой столбец двигать
+        if (startPoint.x < numberOfRects * rectSize) {
+            xIndex = startPoint.x / rectSize;
+        } else {
+            return;
+        }
+        Log.v(TAG, "xIndex = " + xIndex);
+        Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
+        //заполняем центральную часть копиями прямоугольников из исходной строчки
+        for (int i = numberOfRects; i < numberOfRects * 2; i++) {
+            rectsToRotate[i] = new Rect(
+                    pictureRects[i - numberOfRects][xIndex].left,
+                    pictureRects[i - numberOfRects][xIndex].top,
+                    pictureRects[i - numberOfRects][xIndex].right,
+                    pictureRects[i - numberOfRects][xIndex].bottom
+            );
+        }
+        //заполняем верхнюю часть копиями прямоугольников из исходного столбца со смещением
+        for (int i = 0; i < numberOfRects; i++) {
+            rectsToRotate[i] = new Rect(
+                    pictureRects[i][xIndex].left,
+                    pictureRects[i][xIndex].top - numberOfRects * rectSize,
+                    pictureRects[i][xIndex].right,
+                    pictureRects[i][xIndex].bottom - numberOfRects * rectSize
+            );
+        }
+        //заполняем нижнюю часть копиями прямоугольников из исходнго столбца со смещением
+        for (int i = numberOfRects * 2; i < numberOfRects * 3; i++) {
+            rectsToRotate[i] = new Rect(
+                    pictureRects[i - (numberOfRects * 2)][xIndex].left,
+                    pictureRects[i - (numberOfRects * 2)][xIndex].top + numberOfRects * rectSize,
+                    pictureRects[i - (numberOfRects * 2)][xIndex].right,
+                    pictureRects[i - (numberOfRects * 2)][xIndex].bottom + numberOfRects * rectSize
+            );
+        }
+        //запоминаем исходные координаты прямоугольников
+        for (int i = 0; i < rectsLeftsOnStart.length; i++) {
+            rectsTopsOnStart[i] = rectsToRotate[i].top;
+        }
+        for (int i = 0; i < rectsRightsOnStart.length; i++) {
+            rectsBottomsOnStart[i] = rectsToRotate[i].bottom;
+        }
+        //заполняем массив красок для прямоугольников
+        for (int i = numberOfRects; i < numberOfRects * 2; i++) {
+            paintsToRotate[i] = paints[i - numberOfRects][xIndex];
+        }
+        for (int i = 0; i < numberOfRects; i++) {
+            paintsToRotate[i] = paints[i][xIndex];
+        }
+        for (int i = numberOfRects * 2; i < numberOfRects * 3; i++) {
+            paintsToRotate[i] = paints[i - (numberOfRects * 2)][xIndex];
+        }
+        Log.v(TAG, "vLine is chosen");
     }
 
-    ;
 
     @Override
     public void vSlowMove(Point startPoint, int eventY) {
-
+        //расстояние по вертикали
+        int projOnY = eventY - startPoint.y;
+        //двигаем на это расстояние
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            rectsToRotate[i].set(rectsToRotate[i].left, rectsTopsOnStart[i] + projOnY, rectsToRotate[i].right, rectsBottomsOnStart[i] + projOnY);
+        }
     }
 
     @Override
     public void vPutRectsInPlace() {
+        //выравниваем прямоугольники по сетке
+        int shift = rectsToRotate[numberOfRects * 3 - 1].top % rectSize;
+        if (shift < rectSize / 2) {
+            for (Rect rect : rectsToRotate) {
+                rect.set(rect.left, rect.top - shift, rect.right, rect.bottom - shift);
+            }
+        } else {
+            for (Rect rect : rectsToRotate) {
+                rect.set(rect.left, rect.top - shift + rectSize, rect.right, rect.bottom - shift + rectSize);
+            }
+        }
+
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            Log.v(TAG, "rect" + i + " bottom = " + rectsToRotate[i].bottom);
+        }
+
+        //копируем цвета видимых прямоугольников в основной массив
+        int mostTopIndex = 0;
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            if (rectsToRotate[i].top == 0) {
+                mostTopIndex = i;
+                Log.v(TAG, "mostTopIndex = " + mostTopIndex);
+                break;
+            }
+        }
+        for (int i = 0; i < numberOfRects; i++) {
+            paints[i][xIndex] = paintsToRotate[i + mostTopIndex];
+        }
     }
 
     @Override

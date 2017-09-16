@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             direction = Direction.VRT;
                             Log.v(TAG, "VRT");
-                            presenter.hChoseLineToRotate(startPoint); //заменить таким же, но вертикальным
+                            presenter.vChoseLineToRotate(startPoint);
                         }
                     }
 
