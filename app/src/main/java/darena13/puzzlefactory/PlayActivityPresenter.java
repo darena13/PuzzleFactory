@@ -73,7 +73,13 @@ public class PlayActivityPresenter implements PlayGround {
 
     public void hChoseLineToRotate(Point startPoint) {
         //вычисляем какую строчку двигать
-        yIndex = startPoint.y / rectSize;
+        if (startPoint.y < numberOfRects * rectSize) {
+            yIndex = startPoint.y / rectSize;
+        } else {
+            return;
+        }
+        Log.v(TAG, "yIndex = " + yIndex);
+        Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
         //заполняем центральную часть копиями прямоугольников из исходной строчки
         for (int i = numberOfRects; i < numberOfRects * 2; i++) {
             rectsToRotate[i] = new Rect(
@@ -143,8 +149,7 @@ public class PlayActivityPresenter implements PlayGround {
             Log.v(TAG, "rect" + i + " left = " + rectsToRotate[i].left);
         }
 
-        //копируем видимые прямоугольники в основной массив
-        //узнать самый левый прямоугольник
+        //копируем цвета видимых прямоугольников в основной массив
         int mostLeftIndex = 0;
         for (int i = 0; i < rectsToRotate.length; i++) {
             if (rectsToRotate[i].left == 0) {
@@ -153,7 +158,6 @@ public class PlayActivityPresenter implements PlayGround {
                 break;
             }
         }
-        //скопировать от него 
         System.arraycopy(paintsToRotate, mostLeftIndex, paints[yIndex], 0, numberOfRects);
     }
 
