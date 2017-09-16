@@ -10,6 +10,7 @@ import android.support.annotation.ColorInt;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.TabHost;
 
 /**
  * Created by darena13 on 11.09.2017.
@@ -68,8 +69,6 @@ public class PlayActivityPresenter implements PlayGround {
         rectsRightsOnStart = new int[numberOfRects * 3];
 
         paintsToRotate = new Paint[numberOfRects * 3];
-
-//        yIndex = 0;
     }
 
     public void hChoseLineToRotate(Point startPoint) {
@@ -127,21 +126,23 @@ public class PlayActivityPresenter implements PlayGround {
     }
 
     @Override
-    public void hPutRectsInPlace() {
+    public void hPutRectsInPlaces() {
         //выравниваем прямоугольники по сетке
-        if (rectsToRotate[0].left % rectSize < rectSize / 2) {
+        int shift = rectsToRotate[numberOfRects * 3 - 1].left % rectSize;
+        if (shift < rectSize / 2) {
             for (Rect rect : rectsToRotate) {
-                int newLeft = rectSize * (rect.left / rectSize);
-                int newRight = rectSize * (rect.right / rectSize);
-                rect.set(newLeft, rect.top, newRight, rect.bottom);
+                rect.set(rect.left - shift, rect.top, rect.right - shift, rect.bottom);
             }
         } else {
             for (Rect rect : rectsToRotate) {
-                int newLeft = (rectSize + 1) * (rect.left / rectSize);
-                int newRight = (rectSize + 1) * (rect.right / rectSize);
-                rect.set(newLeft, rect.top, newRight, rect.bottom);
+                rect.set(rect.left - shift + rectSize, rect.top, rect.right - shift + rectSize, rect.bottom);
             }
         }
+
+        for (int i = 0; i < rectsToRotate.length; i++) {
+            Log.v(TAG, "rect" + i + " left = " + rectsToRotate[i].left);
+        }
+
         //копируем видимые прямоугольники в основной массив
         //узнать самый левый прямоугольник
         int mostLeftIndex = 0;
@@ -153,13 +154,15 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
         //скопировать от него 
-        System.arraycopy(rectsToRotate, mostLeftIndex, pictureRects[yIndex], 0, numberOfRects);
+        System.arraycopy(paintsToRotate, mostLeftIndex, paints[yIndex], 0, numberOfRects);
     }
 
     @Override
     public void vChoseLineToRotate(Point startPoint) {
 
-    };
+    }
+
+    ;
 
     @Override
     public void vSlowMove(Point startPoint, int eventY) {
@@ -167,7 +170,8 @@ public class PlayActivityPresenter implements PlayGround {
     }
 
     @Override
-    public void vPutRectsInPlace() {}
+    public void vPutRectsInPlace() {
+    }
 
     @Override
     public void setXYToRects() {

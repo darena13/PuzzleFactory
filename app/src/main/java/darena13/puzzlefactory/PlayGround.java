@@ -12,7 +12,7 @@ public interface PlayGround {
     void vSlowMove(Point startPoint, int eventY);
     void hChoseLineToRotate(Point startPoint);
     void vChoseLineToRotate(Point startPoint);
-    void hPutRectsInPlace();
+    void hPutRectsInPlaces();
     void vPutRectsInPlace();
     void setColorsToPaints();
     void setXYToRects();

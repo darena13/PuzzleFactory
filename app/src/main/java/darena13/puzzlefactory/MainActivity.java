@@ -77,12 +77,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MotionEvent.ACTION_UP:
                     if (direction == Direction.HRZ) {
-                        presenter.hPutRectsInPlace();
+                        presenter.hPutRectsInPlaces();
                     } else {
                         presenter.vPutRectsInPlace();
                     }
                     direction = null;
-//Switch is no bro. Also why always VRT? And mostLeftIndex is broken.
                     break;
                 default:
                     return false;
