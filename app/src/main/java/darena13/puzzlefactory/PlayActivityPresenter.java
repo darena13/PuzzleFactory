@@ -251,9 +251,9 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
-        for (int i = 0; i < rectsToRotate.length; i++) {
-            Log.v(TAG, "rect" + i + " bottom = " + rectsToRotate[i].bottom);
-        }
+//        for (int i = 0; i < rectsToRotate.length; i++) {
+//            Log.v(TAG, "rect" + i + " bottom = " + rectsToRotate[i].bottom);
+//        }
 
         //копируем цвета видимых прямоугольников в основной массив
         int mostTopIndex = 0;

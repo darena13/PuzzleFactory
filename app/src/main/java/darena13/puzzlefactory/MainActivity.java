@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
 
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
                     return true;
                 case MotionEvent.ACTION_MOVE:
-
+                    int dx = (int) eventX - startPoint.x;
+                    int dy = (int) eventY - startPoint.y;
                     if (!(direction == null)) {
                         switch (direction) {
                             case HRZ:
@@ -62,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
                                 presenter.vSlowMove(startPoint, (int) eventY);
                                 break;
                         }
-                    } else if (Math.sqrt(eventX * eventX + eventY * eventY) > 50) {
-                        if (Math.abs(eventX - startPoint.x) > Math.abs(eventY - startPoint.y)) {
+                    } else if (Math.sqrt(dx * dx + dy * dy) > 20) {
+                        if (Math.abs(dx) > Math.abs(dy)) {
                             direction = Direction.HRZ;
                             Log.v(TAG, "HRZ");
                             presenter.hChoseLineToRotate(startPoint);
