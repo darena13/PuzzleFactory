@@ -17,10 +17,9 @@ import android.widget.TabHost;
  */
 
 public class PlayActivityPresenter implements PlayGround {
-    private static final String TAG = "CL Presenter";
+    private static final String TAG = "Play Presenter";
 
     private int numberOfRects;
-    private Display display;
     private Point dSize;
     private int rectSize;
     private Rect[][] pictureRects;
@@ -41,11 +40,11 @@ public class PlayActivityPresenter implements PlayGround {
     private int[] rectsBottomsOnStart;
     private Paint[] paintsToRotate;
 
-    int yIndex;
-    int xIndex;
+    private int yIndex;
+    private int xIndex;
 
     PlayActivityPresenter(Context context) {
-        this.numberOfRects = 7;
+        this.numberOfRects = 7; //будем брать из настроек
         topLeftColor = 0xfffb9908;
         topRightColor = 0xff177a27;
         bottomRightColor = 0xffd34989;
@@ -61,7 +60,7 @@ public class PlayActivityPresenter implements PlayGround {
         }
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        display = wm.getDefaultDisplay();
+        Display display = wm.getDefaultDisplay();
         dSize = new Point();
         display.getSize(dSize);
         rectSize = dSize.x / numberOfRects;
@@ -80,7 +79,7 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public void hChoseLineToRotate(Point startPoint) {
         //вычисляем какую строчку двигать
-        if (startPoint.y < numberOfRects * rectSize) {
+        if (isItInBounds(startPoint)) {
             yIndex = startPoint.y / rectSize;
         } else {
             return;
@@ -131,7 +130,12 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public void hSlowMove(Point startPoint, int eventX) {
         //расстояние по горизонтали
-        int projOnX = eventX - startPoint.x;
+        int projOnX;
+        if (isItInBounds(startPoint)) {
+            projOnX = eventX - startPoint.x;
+        } else {
+            return;
+        }
         //двигаем на это расстояние
         for (int i = 0; i < rectsToRotate.length; i++) {
             rectsToRotate[i].set(rectsLeftsOnStart[i] + projOnX, rectsToRotate[i].top, rectsRightsOnStart[i] + projOnX, rectsToRotate[i].bottom);
@@ -139,9 +143,14 @@ public class PlayActivityPresenter implements PlayGround {
     }
 
     @Override
-    public void hPutRectsInPlaces() {
+    public void hPutRectsInPlaces(Point startPoint) {
         //выравниваем прямоугольники по сетке
-        int shift = rectsToRotate[numberOfRects * 3 - 1].left % rectSize;
+        int shift;
+        if (isItInBounds(startPoint)) {
+            shift = rectsToRotate[numberOfRects * 3 - 1].left % rectSize;
+        } else {
+            return;
+        }
         if (shift < rectSize / 2) {
             for (Rect rect : rectsToRotate) {
                 rect.set(rect.left - shift, rect.top, rect.right - shift, rect.bottom);
@@ -152,9 +161,9 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
-        for (int i = 0; i < rectsToRotate.length; i++) {
-            Log.v(TAG, "rect" + i + " left = " + rectsToRotate[i].left);
-        }
+//        for (int i = 0; i < rectsToRotate.length; i++) {
+//            Log.v(TAG, "rect" + i + " left = " + rectsToRotate[i].left);
+//        }
 
         //копируем цвета видимых прямоугольников в основной массив
         int mostLeftIndex = 0;
@@ -172,13 +181,13 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public void vChoseLineToRotate(Point startPoint) {
         //вычисляем какой столбец двигать
-        if (startPoint.x < numberOfRects * rectSize) {
+        if (isItInBounds(startPoint)) {
             xIndex = startPoint.x / rectSize;
         } else {
             return;
         }
-        Log.v(TAG, "xIndex = " + xIndex);
-        Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
+//        Log.v(TAG, "xIndex = " + xIndex);
+//        Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
         //заполняем центральную часть копиями прямоугольников из исходной строчки
         for (int i = numberOfRects; i < numberOfRects * 2; i++) {
             rectsToRotate[i] = new Rect(
@@ -230,7 +239,12 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public void vSlowMove(Point startPoint, int eventY) {
         //расстояние по вертикали
-        int projOnY = eventY - startPoint.y;
+        int projOnY;
+        if (isItInBounds(startPoint)) {
+            projOnY = eventY - startPoint.y;
+        } else {
+            return;
+        }
         //двигаем на это расстояние
         for (int i = 0; i < rectsToRotate.length; i++) {
             rectsToRotate[i].set(rectsToRotate[i].left, rectsTopsOnStart[i] + projOnY, rectsToRotate[i].right, rectsBottomsOnStart[i] + projOnY);
@@ -238,9 +252,14 @@ public class PlayActivityPresenter implements PlayGround {
     }
 
     @Override
-    public void vPutRectsInPlace() {
+    public void vPutRectsInPlace(Point startPoint) {
         //выравниваем прямоугольники по сетке
-        int shift = rectsToRotate[numberOfRects * 3 - 1].top % rectSize;
+        int shift;
+        if (isItInBounds(startPoint)) {
+            shift = rectsToRotate[numberOfRects * 3 - 1].top % rectSize;
+        } else {
+            return;
+        }
         if (shift < rectSize / 2) {
             for (Rect rect : rectsToRotate) {
                 rect.set(rect.left, rect.top - shift, rect.right, rect.bottom - shift);
@@ -302,5 +321,17 @@ public class PlayActivityPresenter implements PlayGround {
                 canvas.drawRect(rectsToRotate[i], paintsToRotate[i]);
             }
         }
+    }
+
+    public void drawFrame(Canvas canvas) {
+        Log.v(TAG, "drawFrame");
+        Rect frameBottomRect = new Rect(0, numberOfRects * rectSize, dSize.x, dSize.y);
+        Paint frameColor = new Paint();
+        frameColor.setColor(0xff000000);
+        canvas.drawRect(frameBottomRect, frameColor);
+    }
+
+    public boolean isItInBounds(Point startPoint) {
+        return startPoint.x < numberOfRects * rectSize && startPoint.y < numberOfRects * rectSize;
     }
 }

@@ -9,16 +9,23 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
-public class MainActivity extends AppCompatActivity {
+public class PlayActivity extends AppCompatActivity {
     private static final String TAG = "COLORLOVERS Main";
     PlayActivityPresenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(R.style.AppTheme);
+//        //возвращаем основную тему после показа сплешскрина (Branded launch)
+//        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_main);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         presenter = new PlayActivityPresenter(getApplicationContext());
 
@@ -40,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.BLACK);
             presenter.drawRects(canvas);
+            presenter.drawFrame(canvas);
         }
 
         @Override
@@ -79,11 +87,13 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case MotionEvent.ACTION_UP:
                     if (direction == Direction.HRZ) {
-                        presenter.hPutRectsInPlaces();
+                        presenter.hPutRectsInPlaces(startPoint);
                     } else {
-                        presenter.vPutRectsInPlace();
+                        presenter.vPutRectsInPlace(startPoint);
                     }
                     direction = null;
+                    //проверка на победу
+                    //сохраняем прогресс
                     break;
                 default:
                     return false;

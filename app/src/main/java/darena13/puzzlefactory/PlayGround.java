@@ -12,9 +12,11 @@ public interface PlayGround {
     void vSlowMove(Point startPoint, int eventY);
     void hChoseLineToRotate(Point startPoint);
     void vChoseLineToRotate(Point startPoint);
-    void hPutRectsInPlaces();
-    void vPutRectsInPlace();
+    void hPutRectsInPlaces(Point startPoint);
+    void vPutRectsInPlace(Point startPoint);
     void setColorsToPaints();
     void setXYToRects();
     void drawRects(Canvas canvas);
+    void drawFrame(Canvas canvas);
+    boolean isItInBounds(Point startPoint);
 }
