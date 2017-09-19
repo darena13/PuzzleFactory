@@ -46,6 +46,7 @@ public class PlayActivity extends AppCompatActivity {
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.BLACK);
+            presenter.drawBackground(canvas);
             presenter.drawRects(canvas);
             presenter.drawFrame(canvas);
         }

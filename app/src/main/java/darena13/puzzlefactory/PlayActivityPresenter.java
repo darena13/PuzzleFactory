@@ -23,7 +23,6 @@ public class PlayActivityPresenter implements PlayGround {
     private Point dSize;
     private int rectSize;
     private Rect[][] pictureRects;
-
     private Paint[][] paints;
 
     @ColorInt
@@ -31,6 +30,9 @@ public class PlayActivityPresenter implements PlayGround {
     private int topRightColor;
     private int bottomRightColor;
     private int bottomLeftColor;
+
+    @ColorInt
+    private int bgColor;  //будем брать из настроек или из другого общего места
 
     private Rect[] rectsToRotate;
 
@@ -73,6 +75,8 @@ public class PlayActivityPresenter implements PlayGround {
         rectsBottomsOnStart = new int[numberOfRects * 3];
 
         paintsToRotate = new Paint[numberOfRects * 3];
+
+        bgColor = 0xfffceee5;
     }
 
     //HORIZONTAL
@@ -222,7 +226,7 @@ public class PlayActivityPresenter implements PlayGround {
         for (int i = 0; i < rectsRightsOnStart.length; i++) {
             rectsBottomsOnStart[i] = rectsToRotate[i].bottom;
         }
-        //заполняем массив красок для прямоугольников
+        //заполняем массив красок для прямоугольников //запихнуть в один цикл?
         for (int i = numberOfRects; i < numberOfRects * 2; i++) {
             paintsToRotate[i] = paints[i - numberOfRects][xIndex];
         }
@@ -323,14 +327,25 @@ public class PlayActivityPresenter implements PlayGround {
         }
     }
 
+    @Override
     public void drawFrame(Canvas canvas) {
         Log.v(TAG, "drawFrame");
         Rect frameBottomRect = new Rect(0, numberOfRects * rectSize, dSize.x, dSize.y);
-        Paint frameColor = new Paint();
-        frameColor.setColor(0xff000000);
-        canvas.drawRect(frameBottomRect, frameColor);
+        Paint framePaint = new Paint();
+        framePaint.setColor(0xffffffff);
+        canvas.drawRect(frameBottomRect, framePaint);
     }
 
+    @Override
+    public void drawBackground(Canvas canvas) {
+        Log.v(TAG, "drawBG");
+        Rect bgRect = new Rect(0, 0, dSize.x, dSize.y);
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(bgColor);
+        canvas.drawRect(bgRect, bgPaint);
+    }
+
+    @Override
     public boolean isItInBounds(Point startPoint) {
         return startPoint.x < numberOfRects * rectSize && startPoint.y < numberOfRects * rectSize;
     }

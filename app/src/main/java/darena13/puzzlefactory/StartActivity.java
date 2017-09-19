@@ -1,6 +1,7 @@
 package darena13.puzzlefactory;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -37,15 +38,16 @@ public class StartActivity extends AppCompatActivity {
 
         public DrawView(Context context) {
             super(context);
-//            presenter.setColorsToPaints();
-//            presenter.setXYToRects();
+            presenter.setColorsToPaints();
+            presenter.setXYToRects();
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.BLACK);
-//            presenter.drawRects(canvas);
-//            presenter.drawFrame(canvas);
+            presenter.drawBackground(canvas);
+            presenter.drawRects(canvas);
+            presenter.drawFrame(canvas);
         }
 
         @Override
@@ -54,7 +56,11 @@ public class StartActivity extends AppCompatActivity {
             final float eventY = event.getY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-
+                    //проверяем не кнопочка ли
+                    if (presenter.isBtn((int) eventX,(int) eventY)) {
+                        Intent intent = new Intent(StartActivity.this, PlayActivity.class);
+                        startActivity(intent);
+                    }
                     return true;
                 case MotionEvent.ACTION_MOVE:
 

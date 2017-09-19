@@ -19,4 +19,5 @@ public interface PlayGround {
     void drawRects(Canvas canvas);
     void drawFrame(Canvas canvas);
     boolean isItInBounds(Point startPoint);
+    void drawBackground(Canvas canvas);
 }
