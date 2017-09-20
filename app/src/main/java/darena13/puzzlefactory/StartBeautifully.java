@@ -12,4 +12,5 @@ public interface StartBeautifully {
     void drawRects(Canvas canvas);
     void drawFrame(Canvas canvas);
     void drawBackground(Canvas canvas);
+    boolean isBtn (int eventX, int eventY);
 }

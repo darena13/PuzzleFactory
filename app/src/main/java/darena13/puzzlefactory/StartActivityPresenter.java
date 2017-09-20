@@ -114,6 +114,7 @@ public class StartActivityPresenter implements StartBeautifully {
         canvas.drawRect(bgRect, bgPaint);
     }
 
+    @Override
     public boolean isBtn (int eventX, int eventY) {
        return true;
     }
