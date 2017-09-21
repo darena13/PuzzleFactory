@@ -64,7 +64,6 @@ public class StartActivityPresenter implements StartBeautifully {
     @Override
     public void setColorsToPaints() {
 //        int[][] colors = GradientGenerator.fourColors(numberOfRects, 0xfffceee5, 0xfffceee5, 0xfffceee5, 0xfffceee5);
-//        int[][] colors = PuzzleGenerator.puzzle(numberOfRects, 0);
         int[][] colors = ColorSets.getPuzzle(0);
         String stringYouWant = String.valueOf(colors[0][0]);
         Log.v(TAG, "color[0][0] = " + stringYouWant);

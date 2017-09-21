@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 /**
- * Created by darena13 on 21.9.17.
+ * Created by darena13 on 21.09.17.
  */
 
 public class WinDialog extends DialogFragment implements OnClickListener {
@@ -27,25 +27,13 @@ public class WinDialog extends DialogFragment implements OnClickListener {
                              Bundle savedInstanceState) {
         getDialog().setTitle("Win");
         View v = inflater.inflate(R.layout.win_dialog, null);
-//        v.findViewById(R.id.btnYes).setOnClickListener(this);
-//        v.findViewById(R.id.btnNo).setOnClickListener(this);
-//        v.findViewById(R.id.btnMaybe).setOnClickListener(this);
         return v;
     }
 
     public void onClick(View v) {
         //TODO: НЕ РАБОТАЕТ
+        //TODO: сделать две кнопки: share и переход к активити с уровнями
         Log.d(TAG, "dismiss");
         dismiss();
     }
-
-//    public void onDismiss(DialogInterface dialog) {
-//        super.onDismiss(dialog);
-//        Log.d(TAG, "Dialog 1: onDismiss");
-//    }
-//
-//    public void onCancel(DialogInterface dialog) {
-//        super.onCancel(dialog);
-//        Log.d(TAG, "Dialog 1: onCancel");
-//    }
 }

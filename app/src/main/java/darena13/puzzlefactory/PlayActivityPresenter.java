@@ -59,6 +59,7 @@ public class PlayActivityPresenter implements PlayGround {
         paints = new Paint[numberOfRects][numberOfRects];
         paintsToWin = new Paint[numberOfRects][numberOfRects];
 
+
         for (int i = 0; i < paints.length; i++) {
             for (int j = 0; j < paints[i].length; j++) {
                 paints[i][j] = new Paint();
