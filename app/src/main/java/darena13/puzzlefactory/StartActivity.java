@@ -4,10 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -22,7 +20,6 @@ public class StartActivity extends AppCompatActivity {
         //возвращаем основную тему после показа сплешскрина (Branded launch)
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -48,6 +45,7 @@ public class StartActivity extends AppCompatActivity {
             presenter.drawBackground(canvas);
             presenter.drawRects(canvas);
             presenter.drawFrame(canvas);
+            //TODO: добавить какую-нибудь милую анимацию
         }
 
         @Override

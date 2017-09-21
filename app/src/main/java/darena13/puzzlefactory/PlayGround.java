@@ -1,6 +1,7 @@
 package darena13.puzzlefactory;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 
 /**
@@ -14,10 +15,13 @@ public interface PlayGround {
     void vChoseLineToRotate(Point startPoint);
     void hPutRectsInPlaces(Point startPoint);
     void vPutRectsInPlace(Point startPoint);
-    void setColorsToPaints();
+    void setPaintsToWin(int index);
+    int[][] mixPuzzle(int index);
+    void setColorsToPaints(int index);
     void setXYToRects();
     void drawRects(Canvas canvas);
     void drawFrame(Canvas canvas);
-    boolean isItInBounds(Point startPoint);
     void drawBackground(Canvas canvas);
+    boolean isItInBounds(Point startPoint);
+    boolean isWin();
 }
