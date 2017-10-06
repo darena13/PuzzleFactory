@@ -56,7 +56,7 @@ public class StartActivity extends AppCompatActivity {
                 case MotionEvent.ACTION_DOWN:
                     //проверяем не кнопочка ли
                     if (presenter.isBtn((int) eventX,(int) eventY)) {
-                        Intent intent = new Intent(StartActivity.this, PlayActivity.class);
+                        Intent intent = new Intent(StartActivity.this, LevelsActivity.class);
                         startActivity(intent);
                     }
                     return true;

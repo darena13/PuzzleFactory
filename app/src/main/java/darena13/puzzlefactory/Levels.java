@@ -11,4 +11,7 @@ public interface Levels {
     void leafOver(Point startPoint, int eventX);
     int choseLevel(Point event);
     void drawBackground(Canvas canvas);
+    void setXYToRects();
+    void setColorsToLevelsPaints();
+    void drawRects(Canvas canvas);
 }

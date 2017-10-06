@@ -303,11 +303,16 @@ public class PlayActivityPresenter implements PlayGround {
         }
     }
 
+    //задаем координаты прямоугольников
     @Override
     public void setXYToRects() {
         for (int i = 0; i < pictureRects.length; i++) {
             for (int j = 0; j < pictureRects[i].length; j++) {
-                pictureRects[i][j] = new Rect(j * rectSize, i * rectSize, j * rectSize + rectSize, i * rectSize + rectSize);
+                pictureRects[i][j] = new Rect(
+                        j * rectSize,
+                        i * rectSize,
+                        j * rectSize + rectSize,
+                        i * rectSize + rectSize);
             }
         }
     }

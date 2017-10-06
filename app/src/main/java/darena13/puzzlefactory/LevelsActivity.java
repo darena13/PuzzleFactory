@@ -37,17 +37,16 @@ public class LevelsActivity extends AppCompatActivity {
 
         public DrawView(Context context) {
             super(context);
-            //
-//            presenter.setPaintsToWin(puzzleIndex);
-//            presenter.setColorsToPaints(puzzleIndex);
-//            presenter.setXYToRects();
+
+            presenter.setColorsToLevelsPaints();
+            presenter.setXYToRects();
         }
 
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.BLACK);
             presenter.drawBackground(canvas);
-//            presenter.drawRects(canvas);
+            presenter.drawRects(canvas);
 //            presenter.drawFrame(canvas);
         }
 
