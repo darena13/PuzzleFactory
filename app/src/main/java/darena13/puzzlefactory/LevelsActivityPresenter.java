@@ -24,7 +24,8 @@ public class LevelsActivityPresenter implements Levels {
     private int hOffset;
     private int vOffset;
 
-    private Rect[][][] levelsRects;
+//    private Rect[][][] levelsRects;
+    private PuzzleRects[] levelsRects;
     private Paint[][][] levelsPaints;
     private int levelsNumber;
 
@@ -42,9 +43,15 @@ public class LevelsActivityPresenter implements Levels {
         rectSize = dSize.x / (numberOfRects + 2);
 
         hOffset = dSize.x / (numberOfRects + 2);
-        vOffset = dSize.y /6;
+        vOffset = dSize.y / 6;
         levelsNumber = 5;
-        levelsRects = new Rect[levelsNumber][numberOfRects][numberOfRects];
+//        levelsRects = new Rect[levelsNumber][numberOfRects][numberOfRects];
+        levelsRects = new PuzzleRects[levelsNumber];
+
+        for (int i = 0; i < levelsRects.length; i++) {
+            levelsRects[i] = new PuzzleRects(numberOfRects);
+        }
+
         levelsPaints = new Paint[levelsNumber][numberOfRects][numberOfRects];
 
         for (int k = 0; k < levelsPaints.length; k++) {
@@ -54,6 +61,8 @@ public class LevelsActivityPresenter implements Levels {
                 }
             }
         }
+
+        bgColor = 0xfffceee5;
     }
 
     @Override
@@ -76,25 +85,22 @@ public class LevelsActivityPresenter implements Levels {
         canvas.drawRect(bgRect, bgPaint);
     }
 
-    //делаем 10 массивов = 10 уровней
-    //делаем 10 кнопак
-    //меню настроек
-    //список паков с уровнями
-    //сделать канвас во фрагменте?
-
     //задаем координаты прямоугольников
     @Override
     public void setXYToRects() {
+//        for (int k = 0; k < levelsRects.length; k++) {
+//            for (int i = 0; i < levelsRects[k].length; i++) {
+//                for (int j = 0; j < levelsRects[k][i].length; j++) {
+//                    levelsRects[k][i][j] = new Rect(
+//                            j * rectSize + hOffset, //left
+//                            i * rectSize + numberOfRects * rectSize * k + vOffset * (k + 1), // top
+//                            j * rectSize + rectSize + hOffset, // right
+//                            i * rectSize + rectSize + numberOfRects * rectSize * k + vOffset * (k + 1)); // bottom
+//                }
+//            }
+//        }
         for (int k = 0; k < levelsRects.length; k++) {
-            for (int i = 0; i < levelsRects[k].length; i++) {
-                for (int j = 0; j < levelsRects[k][i].length; j++) {
-                    levelsRects[k][i][j] = new Rect(
-                            j * rectSize + hOffset, //left
-                            i * rectSize + numberOfRects * rectSize * k + vOffset * (k + 1), // top
-                            j * rectSize + rectSize + hOffset, // right
-                            i * rectSize + rectSize + numberOfRects * rectSize * k + vOffset * (k + 1)); // bottom
-                }
-            }
+            levelsRects[k].setXY(rectSize, numberOfRects * rectSize * k, vOffset * (k + 1), hOffset);
         }
     }
 
@@ -108,11 +114,8 @@ public class LevelsActivityPresenter implements Levels {
         }
 
         for (int k = 0; k < levelsPaints.length; k++) {
-            Log.v(TAG, "Length k = " + levelsPaints.length);
             for (int i = 0; i < levelsPaints[k].length; i++) {
-                Log.v(TAG, "Length i = " + levelsPaints[k].length);
                 for (int j = 0; j < levelsPaints[k][i].length; j++) {
-                    Log.v(TAG, "Length j = " + levelsPaints[k][i].length);
                     levelsPaints[k][i][j].setColor(colors[k][i][j]);
                 }
             }
@@ -122,12 +125,65 @@ public class LevelsActivityPresenter implements Levels {
     @Override
     public void drawRects(Canvas canvas) {
         //рисуем все прямоугольники из изначального массива
+//        for (int k = 0; k < levelsRects.length; k++) {
+//            for (int i = 0; i < levelsRects[k].length; i++) {
+//                for (int j = 0; j < levelsRects[k][i].length; j++) {
+//                    canvas.drawRect(levelsRects[k][i][j], levelsPaints[k][i][j]);
+//                }
+//            }
+//        }
+        Rect[][] rectsToDraw;
         for (int k = 0; k < levelsRects.length; k++) {
-            for (int i = 0; i < levelsRects[k].length; i++) {
-                for (int j = 0; j < levelsRects[k][i].length; j++) {
-                    canvas.drawRect(levelsRects[k][i][j], levelsPaints[k][i][j]);
+            rectsToDraw = levelsRects[k].getRects();
+            for (int i = 0; i < rectsToDraw.length; i++) {
+                for (int j = 0; j < rectsToDraw[i].length; j++) {
+                    canvas.drawRect(rectsToDraw[i][j], levelsPaints[k][i][j]);
                 }
             }
         }
+    }
+
+    @Override
+    public void moveAll(int distY) {
+//        if (levelsRects[0][0][0].top > vOffset & distY > 0) {
+//            return;
+//        }
+//        if ((dSize.y - levelsRects[levelsRects.length - 1][numberOfRects - 1][numberOfRects - 1].bottom) > vOffset & distY < 0) {
+//            return;
+//        }
+//        for (int k = 0; k < levelsRects.length; k++) {
+//            for (int i = 0; i < levelsRects[k].length; i++) {
+//                for (int j = 0; j < levelsRects[k][i].length; j++) {
+//                    levelsRects[k][i][j].set(
+//                            levelsRects[k][i][j].left, //left
+//                            levelsRects[k][i][j].top + distY, // top
+//                            levelsRects[k][i][j].right, // right
+//                            levelsRects[k][i][j].bottom + distY); // bottom
+//                }
+//            }
+//        }
+        Log.v(TAG, "moveAll");
+        if (levelsRects[0].getTop() > vOffset & distY > 0) {
+            Log.v(TAG, "moveAll - cant move further down");
+            return;
+        }
+        if ((dSize.y - levelsRects[levelsRects.length - 1].getBottom()) > vOffset & distY < 0) {
+            Log.v(TAG, "moveAll - cant move further up");
+            return;
+        }
+        for (int k = 0; k < levelsRects.length; k++) {
+            Log.v(TAG, "moveAll - MOVIN");
+            levelsRects[k].vMove(distY);
+        }
+    }
+
+    @Override
+    public int getSelectedPuzzle(int eventY) {
+        for (int i = 0; i < levelsRects.length; i++) {
+            if (eventY >= levelsRects[i].getTop() && eventY <= levelsRects[i].getBottom()) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

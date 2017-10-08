@@ -14,4 +14,6 @@ public interface Levels {
     void setXYToRects();
     void setColorsToLevelsPaints();
     void drawRects(Canvas canvas);
+    void moveAll(int distY);
+    int getSelectedPuzzle(int eventY);
 }

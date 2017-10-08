@@ -329,6 +329,7 @@ public class PlayActivityPresenter implements PlayGround {
 
     @Override
     public int[][] mixPuzzle(int index) {
+        Log.v(TAG, "mixPuzzle");
         int[][] colors = ColorSets.getPuzzle(index);
         Random ran = new Random();
         int randomLine = ran.nextInt(7);
