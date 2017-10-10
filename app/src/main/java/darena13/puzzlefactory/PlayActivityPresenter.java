@@ -27,12 +27,6 @@ public class PlayActivityPresenter implements PlayGround {
     private Paint[][] paints;
     private Paint[][] paintsToWin;
 
-//    @ColorInt
-//    private int topLeftColor;
-//    private int topRightColor;
-//    private int bottomRightColor;
-//    private int bottomLeftColor;
-
     @ColorInt
     private int bgColor;  //будем брать из настроек или из другого общего места
 
@@ -330,7 +324,7 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public int[][] mixPuzzle(int index) {
         Log.v(TAG, "mixPuzzle");
-        int[][] colors = ColorSets.getPuzzle(index);
+        int[][] colors = Utils.copyTwoDimArr(ColorSets.getPuzzle(index));
         Random ran = new Random();
         int randomLine = ran.nextInt(7);
         int randomDist = ran.nextInt(6) + 1;

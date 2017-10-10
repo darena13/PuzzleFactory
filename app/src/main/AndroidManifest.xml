@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PlayActivity" />
-        <activity android:name=".LevelsActivity"></activity>
+        <activity android:name=".LevelsActivity" />
+        <activity android:name=".WinActivity"></activity>
     </application>
 
 </manifest>

@@ -17,7 +17,7 @@ import android.view.WindowManager;
 public class PlayActivity extends AppCompatActivity {
     private static final String TAG = "COLORLOVERS Main";
     PlayActivityPresenter presenter;
-    int puzzleIndex = 0; //получим из интента
+    int puzzleIndex; //получим из интента
     DialogFragment winDialog;
 
     @Override
@@ -26,7 +26,6 @@ public class PlayActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-
         if(bundle != null){
             puzzleIndex = bundle.getInt("SELECTED_PUZZLE");
             Log.v(TAG, "puzzleIndex = " + puzzleIndex);
@@ -115,7 +114,10 @@ public class PlayActivity extends AppCompatActivity {
                     //проверка на победу
                     if (presenter.isWin()) {
                         Log.v(TAG, "WIN!");
-                        winDialog.show(getFragmentManager(), "winDialog");
+//                        winDialog.show(getFragmentManager(), "winDialog");
+                        Intent intent = new Intent(PlayActivity.this, WinActivity.class);
+                        intent.putExtra("PUZZLE", puzzleIndex);
+                        startActivity(intent);
                         //TODO: няшную анимацию - пусть там котик с радугой пролетает или чё
                         //TODO: показывать результат (ходов) и насколько это круто
                         //TODO: фиксируем, что пазл собран (в активити с уровнями это будет видно)
