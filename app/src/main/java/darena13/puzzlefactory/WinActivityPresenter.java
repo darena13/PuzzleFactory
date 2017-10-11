@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.annotation.ColorInt;
+import android.support.annotation.StringDef;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
@@ -20,6 +21,7 @@ public class WinActivityPresenter implements AfterWin{
     private Point dSize;@ColorInt
     private int bgColor;  //будем брать из настроек или из другого общего места
     private String congrat;
+    private String perfect;
     private Paint textPaint;
 
 
@@ -30,6 +32,7 @@ public class WinActivityPresenter implements AfterWin{
         display.getSize(dSize);
 
         congrat = "WOW! You are like rainbow moon light on unicorn skin at warm summer night!"; //будем генерить и локализировать
+        perfect = "Perfect!";
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(0xFFFF4081);
         textPaint.setTextSize(100);
@@ -50,6 +53,13 @@ public class WinActivityPresenter implements AfterWin{
     @Override
     public void drawText(Canvas canvas) {
         Log.v(TAG, "drawText");
-        canvas.drawText(congrat, 0, dSize.y / 2, textPaint);
+        canvas.drawText(congrat, dSize.x / 2, dSize.y / 3, textPaint);
+    }
+
+    @Override
+    public void drawTextPerfect(Canvas canvas) {
+        Log.v(TAG, "drawTextPerfect");
+        canvas.drawText(perfect, 0, dSize.y / 2, textPaint);
+
     }
 }

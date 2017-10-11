@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
-import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -24,16 +23,18 @@ public class PlayActivityPresenter implements PlayGround {
     private Point dSize;
     private int rectSize;
     private int hintRectSize;
-    private Rect[][] pictureRects;
-    private PuzzleRects hintRects;
+
+    private PuzzleRects pictureRects;
     private Paint[][] paints;
+
     private Paint[][] paintsToWin;
+
+    private PuzzleRects hintRects;
 
     @ColorInt
     private int bgColor;  //будем брать из настроек или из другого общего места
 
     private Rect[] rectsToRotate;
-
     private int[] rectsLeftsOnStart;
     private int[] rectsRightsOnStart;
     private int[] rectsTopsOnStart;
@@ -44,21 +45,27 @@ public class PlayActivityPresenter implements PlayGround {
     private int xIndex;
 
     private int movesPerfect;
+
     private int movesMade;
+
     private PuzzleRects movesRects;
     private Paint[][] movesPaints;
+    private int topMargin;
 
+    private Rect redReset;
+
+    private Paint redResetPaint;
     PlayActivityPresenter(Context context) {
-        //перенести всякую инициализацию в отдельный метод? или наделать сеттеров?
         this.numberOfRects = 7; //будем брать из настроек
+        movesPerfect = 2;
 
-        pictureRects = new Rect[numberOfRects][numberOfRects];
+        pictureRects = new PuzzleRects(numberOfRects, numberOfRects);
         paints = new Paint[numberOfRects][numberOfRects];
         paintsToWin = new Paint[numberOfRects][numberOfRects];
 
         hintRects = new PuzzleRects(numberOfRects, numberOfRects);
-        movesRects = new PuzzleRects(numberOfRects, 1);
-        movesPaints = new Paint[numberOfRects][1];
+        movesRects = new PuzzleRects(movesPerfect + 1, 1);
+        movesPaints = new Paint[movesPerfect + 1][1];
 
 
         for (int i = 0; i < paints.length; i++) {
@@ -79,6 +86,8 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
+        redResetPaint = new Paint();
+
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         dSize = new Point();
@@ -96,6 +105,12 @@ public class PlayActivityPresenter implements PlayGround {
         paintsToRotate = new Paint[numberOfRects * 3];
 
         bgColor = 0xfffceee5;
+
+        topMargin = dSize.y - (numberOfRects * rectSize);
+    }
+
+    public void setMovesMade(int movesMade) {
+        this.movesMade = movesMade;
     }
 
     //HORIZONTAL
@@ -103,39 +118,14 @@ public class PlayActivityPresenter implements PlayGround {
     public void hChoseLineToRotate(Point startPoint) {
         //вычисляем какую строчку двигать
         if (isItInBounds(startPoint)) {
-            yIndex = startPoint.y / rectSize;
+            yIndex = (startPoint.y - topMargin) / rectSize;
         } else {
             return;
         }
         Log.v(TAG, "yIndex = " + yIndex);
         Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
-        //заполняем центральную часть копиями прямоугольников из исходной строчки
-        for (int i = numberOfRects; i < numberOfRects * 2; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[yIndex][i - numberOfRects].left,
-                    pictureRects[yIndex][i - numberOfRects].top,
-                    pictureRects[yIndex][i - numberOfRects].right,
-                    pictureRects[yIndex][i - numberOfRects].bottom
-            );
-        }
-        //заполняем левую часть копиями прямоугольников из исходной строчки со смещением
-        for (int i = 0; i < numberOfRects; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[yIndex][i].left - numberOfRects * rectSize,
-                    pictureRects[yIndex][i].top,
-                    pictureRects[yIndex][i].right - numberOfRects * rectSize,
-                    pictureRects[yIndex][i].bottom
-            );
-        }
-        //заполняем правую часть копиями прямоугольников из исходной строчки со смещением
-        for (int i = numberOfRects * 2; i < numberOfRects * 3; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[yIndex][i - (numberOfRects * 2)].left + numberOfRects * rectSize,
-                    pictureRects[yIndex][i - (numberOfRects * 2)].top,
-                    pictureRects[yIndex][i - (numberOfRects * 2)].right + numberOfRects * rectSize,
-                    pictureRects[yIndex][i - (numberOfRects * 2)].bottom
-            );
-        }
+        //заполняем rectToRotate копиями из pictureRects
+        pictureRects.hFillToRotate(rectsToRotate, numberOfRects, yIndex, rectSize);
         //запоминаем исходные координаты прямоугольников
         for (int i = 0; i < rectsLeftsOnStart.length; i++) {
             rectsLeftsOnStart[i] = rectsToRotate[i].left;
@@ -207,35 +197,7 @@ public class PlayActivityPresenter implements PlayGround {
         } else {
             return;
         }
-//        Log.v(TAG, "xIndex = " + xIndex);
-//        Log.v(TAG, "startPoint = " + startPoint.x + " " + startPoint.y);
-        //заполняем центральную часть копиями прямоугольников из исходной строчки
-        for (int i = numberOfRects; i < numberOfRects * 2; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[i - numberOfRects][xIndex].left,
-                    pictureRects[i - numberOfRects][xIndex].top,
-                    pictureRects[i - numberOfRects][xIndex].right,
-                    pictureRects[i - numberOfRects][xIndex].bottom
-            );
-        }
-        //заполняем верхнюю часть копиями прямоугольников из исходного столбца со смещением
-        for (int i = 0; i < numberOfRects; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[i][xIndex].left,
-                    pictureRects[i][xIndex].top - numberOfRects * rectSize,
-                    pictureRects[i][xIndex].right,
-                    pictureRects[i][xIndex].bottom - numberOfRects * rectSize
-            );
-        }
-        //заполняем нижнюю часть копиями прямоугольников из исходнго столбца со смещением
-        for (int i = numberOfRects * 2; i < numberOfRects * 3; i++) {
-            rectsToRotate[i] = new Rect(
-                    pictureRects[i - (numberOfRects * 2)][xIndex].left,
-                    pictureRects[i - (numberOfRects * 2)][xIndex].top + numberOfRects * rectSize,
-                    pictureRects[i - (numberOfRects * 2)][xIndex].right,
-                    pictureRects[i - (numberOfRects * 2)][xIndex].bottom + numberOfRects * rectSize
-            );
-        }
+        pictureRects.vFillToRotate(rectsToRotate, numberOfRects, xIndex, rectSize);
         //запоминаем исходные координаты прямоугольников
         for (int i = 0; i < rectsLeftsOnStart.length; i++) {
             rectsTopsOnStart[i] = rectsToRotate[i].top;
@@ -277,7 +239,7 @@ public class PlayActivityPresenter implements PlayGround {
         //выравниваем прямоугольники по сетке
         int shift;
         if (isItInBounds(startPoint)) {
-            shift = rectsToRotate[numberOfRects * 3 - 1].top % rectSize;
+            shift = (rectsToRotate[numberOfRects * 3 - 1].bottom - topMargin) % rectSize;
         } else {
             return;
         }
@@ -290,11 +252,10 @@ public class PlayActivityPresenter implements PlayGround {
                 rect.set(rect.left, rect.top - shift + rectSize, rect.right, rect.bottom - shift + rectSize);
             }
         }
-
         //копируем цвета видимых прямоугольников в основной массив
         int mostTopIndex = 0;
         for (int i = 0; i < rectsToRotate.length; i++) {
-            if (rectsToRotate[i].top == 0) {
+            if (rectsToRotate[i].top == topMargin) {
                 mostTopIndex = i;
                 Log.v(TAG, "mostTopIndex = " + mostTopIndex);
                 break;
@@ -310,17 +271,14 @@ public class PlayActivityPresenter implements PlayGround {
     //задаем координаты прямоугольников
     @Override
     public void setXYToRects() {
-        for (int i = 0; i < pictureRects.length; i++) {
-            for (int j = 0; j < pictureRects[i].length; j++) {
-                pictureRects[i][j] = new Rect(
-                        j * rectSize,
-                        i * rectSize,
-                        j * rectSize + rectSize,
-                        i * rectSize + rectSize);
-            }
-        }
-        hintRects.setXY(hintRectSize, 0, 0, rectSize * (numberOfRects + 1), hintRectSize * 3);
-        movesRects.setXY(hintRectSize, 0, 0, rectSize * (numberOfRects + 1),  hintRectSize);
+        pictureRects.setXY(rectSize, 0, 0, topMargin, 0);
+        hintRects.setXY(hintRectSize, 0, 0, rectSize, hintRectSize * 2);
+        movesRects.setXY(hintRectSize, 0, 0, rectSize * 2,  hintRectSize * (numberOfRects + 4));
+        redReset = new Rect(
+                hintRectSize * (numberOfRects + 3),
+                hintRectSize * 4,
+                hintRectSize * (numberOfRects + 6),
+                hintRectSize * 7);
     }
 
     @Override
@@ -378,7 +336,7 @@ public class PlayActivityPresenter implements PlayGround {
     @Override
     public void drawFrame(Canvas canvas) {
         Log.v(TAG, "drawFrame");
-        Rect frameBottomRect = new Rect(0, numberOfRects * rectSize, dSize.x, dSize.y);
+        Rect frameBottomRect = new Rect(0, 0, dSize.x, topMargin);
         Paint framePaint = new Paint();
         framePaint.setColor(bgColor);
         canvas.drawRect(frameBottomRect, framePaint);
@@ -397,7 +355,11 @@ public class PlayActivityPresenter implements PlayGround {
     //проверяем, что нажатие в области пазла
     @Override
     public boolean isItInBounds(Point startPoint) {
-        return startPoint.x < numberOfRects * rectSize && startPoint.y < numberOfRects * rectSize;
+        return
+                (startPoint.y > topMargin)
+                        && (startPoint.y < dSize.y)
+                        && (startPoint.x < numberOfRects * rectSize)
+                        && (startPoint.x > 0);
     }
 
     @Override
@@ -417,6 +379,7 @@ public class PlayActivityPresenter implements PlayGround {
         setColorsToPaintsToWin(puzzleIndex);
         setColorsToPaints(puzzleIndex);
         setColorsToMovesPaints();
+        redResetPaint.setColor(0xffED4E53);
     }
 
     //задаем правильные цвета для проверки на победу и для подсказки
@@ -455,12 +418,7 @@ public class PlayActivityPresenter implements PlayGround {
     //наконец, когда у всех прямоугольников есть координаты и цвет, рисуем все прямоугольники
     @Override
     public void drawRects(Canvas canvas) {
-        //рисуем все прямоугольники из изначального массива
-        for (int i = 0; i < pictureRects.length; i++) {
-            for (int j = 0; j < pictureRects[i].length; j++) {
-                canvas.drawRect(pictureRects[i][j], paints[i][j]);
-            }
-        }
+        pictureRects.drawRects(canvas, paints);
         //рисуем выбранную линию (строчку или столбец)
         if (!(rectsToRotate[0] == null)) {
             for (int i = 0; i < rectsToRotate.length; i++) {
@@ -472,5 +430,23 @@ public class PlayActivityPresenter implements PlayGround {
         //рисуем подсказку
         hintRects.drawRects(canvas, paintsToWin);
         movesRects.drawRects(canvas, movesPaints, movesMade);
+        //если уже много ходов и пора заново
+        if (isOutOfMoves()) {
+            canvas.drawRect(redReset, redResetPaint);
+        }
+    }
+
+    boolean isOutOfMoves() {
+        return movesMade > (movesPerfect + 1);
+    }
+
+    boolean isResetPressed(int eventX, int eventY) {
+        return eventX > redReset.left && eventX < redReset.right && eventY > redReset.top && eventY < redReset.bottom;
+    }
+
+    boolean isPerfect() {
+        Log.v(TAG, "isPerfect");
+//        return movesMade == movesPerfect; !!!! не работает
+        return true;
     }
 }

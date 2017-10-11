@@ -9,4 +9,5 @@ import android.graphics.Canvas;
 public interface AfterWin {
     void drawBackground(Canvas canvas);
     void drawText(Canvas canvas);
+    void drawTextPerfect(Canvas canvas);
 }

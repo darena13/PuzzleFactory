@@ -105,11 +105,17 @@ public class PlayActivity extends AppCompatActivity {
                     }
                     //обнуляем направление вектора
                     direction = null;
+                    //не пора ли ресетнуть
+                    if (presenter.isOutOfMoves() && presenter.isResetPressed((int) eventX, (int) eventY)) {
+                        presenter.setMovesMade(0);
+                        presenter.setColorsToPaints(puzzleIndex);
+                    }
                     //проверка на победу
                     if (presenter.isWin()) {
                         Log.v(TAG, "WIN!");
-//                        winDialog.show(getFragmentManager(), "winDialog");
                         Intent intent = new Intent(PlayActivity.this, WinActivity.class);
+                        if (presenter.isPerfect()) Log.v(TAG, "Perfect!");
+                        intent.putExtra("PERFECT", presenter.isPerfect());
                         intent.putExtra("PUZZLE", puzzleIndex);
                         startActivity(intent);
                         //TODO: показывать результат (ходов) и насколько это круто

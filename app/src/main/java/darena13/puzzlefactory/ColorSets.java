@@ -61,13 +61,13 @@ public class ColorSets {
     };
 
     private final static int[][] puzzle_1000 = {
-            {0xff69D0FF},
-            {0xff8C2D64},
+//            {0xff69D0FF},
+//            {0xff8C2D64},
             {0xffEB508C},
             {0xffFF8469},
             {0xffF5AD4F},
-            {0xff91CC85},
-            {0xff2B9E78}
+//            {0xff91CC85},
+//            {0xff2B9E78}
     };
 
     private static SparseArray<int[][]> map = new SparseArray<>();

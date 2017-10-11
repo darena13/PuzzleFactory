@@ -15,6 +15,7 @@ public class WinActivity extends AppCompatActivity {
     private static final String TAG = "COLORLOVERS AfterWin";
     WinActivityPresenter presenter;
     int puzzleIndex;
+    boolean isPerfect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,7 @@ public class WinActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if(bundle != null){
             puzzleIndex = bundle.getInt("PUZZLE");
+            isPerfect = bundle.getBoolean("PERFECT");
         }
 
         final WinActivity.DrawView drawView = new WinActivity.DrawView(this);
@@ -49,6 +51,9 @@ public class WinActivity extends AppCompatActivity {
             canvas.drawColor(Color.BLACK);
             presenter.drawBackground(canvas);
             presenter.drawText(canvas);
+            if (isPerfect) {
+                presenter.drawTextPerfect(canvas);
+            }
             //TODO: няшную анимацию - пусть там котик с радугой пролетает или чё
 
 //            presenter.drawRects(canvas);
