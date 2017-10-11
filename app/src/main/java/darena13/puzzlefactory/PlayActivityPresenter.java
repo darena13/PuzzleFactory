@@ -23,7 +23,9 @@ public class PlayActivityPresenter implements PlayGround {
     private int numberOfRects;
     private Point dSize;
     private int rectSize;
+    private int hintRectSize;
     private Rect[][] pictureRects;
+    private PuzzleRects hintRects;
     private Paint[][] paints;
     private Paint[][] paintsToWin;
 
@@ -41,17 +43,22 @@ public class PlayActivityPresenter implements PlayGround {
     private int yIndex;
     private int xIndex;
 
+    private int movesPerfect;
+    private int movesMade;
+    private PuzzleRects movesRects;
+    private Paint[][] movesPaints;
+
     PlayActivityPresenter(Context context) {
         //перенести всякую инициализацию в отдельный метод? или наделать сеттеров?
         this.numberOfRects = 7; //будем брать из настроек
-//        topLeftColor = 0xfffb9908;
-//        topRightColor = 0xff177a27;
-//        bottomRightColor = 0xffd34989;
-//        bottomLeftColor = 0xff1c4cb9;
 
         pictureRects = new Rect[numberOfRects][numberOfRects];
         paints = new Paint[numberOfRects][numberOfRects];
         paintsToWin = new Paint[numberOfRects][numberOfRects];
+
+        hintRects = new PuzzleRects(numberOfRects, numberOfRects);
+        movesRects = new PuzzleRects(numberOfRects, 1);
+        movesPaints = new Paint[numberOfRects][1];
 
 
         for (int i = 0; i < paints.length; i++) {
@@ -66,11 +73,18 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
+        for (int i = 0; i < movesPaints.length; i++) {
+            for (int j = 0; j < movesPaints[i].length; j++) {
+                movesPaints[i][j] = new Paint();
+            }
+        }
+
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         dSize = new Point();
         display.getSize(dSize);
         rectSize = dSize.x / numberOfRects;
+        hintRectSize = rectSize / 2;
 
         rectsToRotate = new Rect[numberOfRects * 3];
 
@@ -170,10 +184,6 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
-//        for (int i = 0; i < rectsToRotate.length; i++) {
-//            Log.v(TAG, "rect" + i + " left = " + rectsToRotate[i].left);
-//        }
-
         //копируем цвета видимых прямоугольников в основной массив
         int mostLeftIndex = 0;
         for (int i = 0; i < rectsToRotate.length; i++) {
@@ -184,6 +194,8 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
         System.arraycopy(paintsToRotate, mostLeftIndex, paints[yIndex], 0, numberOfRects);
+
+        movesMade += 1;
     }
 
     //VERTICAL
@@ -279,10 +291,6 @@ public class PlayActivityPresenter implements PlayGround {
             }
         }
 
-//        for (int i = 0; i < rectsToRotate.length; i++) {
-//            Log.v(TAG, "rect" + i + " bottom = " + rectsToRotate[i].bottom);
-//        }
-
         //копируем цвета видимых прямоугольников в основной массив
         int mostTopIndex = 0;
         for (int i = 0; i < rectsToRotate.length; i++) {
@@ -295,6 +303,8 @@ public class PlayActivityPresenter implements PlayGround {
         for (int i = 0; i < numberOfRects; i++) {
             paints[i][xIndex] = paintsToRotate[i + mostTopIndex];
         }
+
+        movesMade += 1;
     }
 
     //задаем координаты прямоугольников
@@ -309,27 +319,35 @@ public class PlayActivityPresenter implements PlayGround {
                         i * rectSize + rectSize);
             }
         }
+        hintRects.setXY(hintRectSize, 0, 0, rectSize * (numberOfRects + 1), hintRectSize * 3);
+        movesRects.setXY(hintRectSize, 0, 0, rectSize * (numberOfRects + 1),  hintRectSize);
     }
 
     @Override
-    public void setPaintsToWin(int index) {
-        int[][] colors = ColorSets.getPuzzle(index);
-        for (int i = 0; i < paintsToWin.length; i++) {
-            for (int j = 0; j < paintsToWin[i].length; j++) {
-                paintsToWin[i][j].setColor(colors[i][j]);
-            }
-        }
-    }
-
-    @Override
-    public int[][] mixPuzzle(int index) {
+    public int[][] mixPuzzle(int index, int times) {
         Log.v(TAG, "mixPuzzle");
         int[][] colors = Utils.copyTwoDimArr(ColorSets.getPuzzle(index));
         Random ran = new Random();
-        int randomLine = ran.nextInt(7);
-        int randomDist = ran.nextInt(6) + 1;
+        //сколько-то раз поворачиваем рандомную колонку и строчку ИЛИ строчку потом колонку на рандомное расстояние
+        for (int i = 0; i < times; i++) {
+            if (ran.nextBoolean()) {
+                rotateColumn(colors);
+                rotateLine(colors);
+            } else {
+                rotateLine(colors);
+                rotateColumn(colors);
+            }
+        }
+        movesPerfect = times;
+        return colors;
+    }
+
+    private void rotateColumn(int[][] colors) {
+        Random ran = new Random();
+        int randomLine = ran.nextInt(numberOfRects);
+        int randomDist = ran.nextInt(numberOfRects - 1) + 1;
         int[] line = new int[numberOfRects];
-        int[] rotatedLine = new int[numberOfRects];
+        int[] rotatedLine;
         //повернуть рандомную колонку на рандомное количество прямоугольников
         for (int i = 0; i < colors.length; i++) {
             line[i] = colors[i][randomLine];
@@ -338,21 +356,84 @@ public class PlayActivityPresenter implements PlayGround {
         for (int i = 0; i < colors.length; i++) {
             colors[i][randomLine] = rotatedLine[i];
         }
+    }
+
+    private void rotateLine(int[][] colors) {
+        Random ran = new Random();
+        int randomLine = ran.nextInt(numberOfRects);
+        int randomDist = ran.nextInt(numberOfRects - 1) + 1;
+        int[] line = new int[numberOfRects];
+        int[] rotatedLine;
         //повернуть рандомный строчку на рандомное количество прямоугольников
         for (int i = 0; i < colors.length; i++) {
             line[i] = colors[randomLine][i];
         }
         rotatedLine = Utils.rotateArray(line, randomDist);
         for (int i = 0; i < colors.length; i++) {
-             colors[randomLine][i] = rotatedLine[i];
+            colors[randomLine][i] = rotatedLine[i];
         }
-        return colors;
+    }
+
+    //прикрываем, что торчит
+    @Override
+    public void drawFrame(Canvas canvas) {
+        Log.v(TAG, "drawFrame");
+        Rect frameBottomRect = new Rect(0, numberOfRects * rectSize, dSize.x, dSize.y);
+        Paint framePaint = new Paint();
+        framePaint.setColor(bgColor);
+        canvas.drawRect(frameBottomRect, framePaint);
+    }
+
+    //рисуем фон
+    @Override
+    public void drawBackground(Canvas canvas) {
+        Log.v(TAG, "drawBG");
+        Rect bgRect = new Rect(0, 0, dSize.x, dSize.y);
+        Paint bgPaint = new Paint();
+        bgPaint.setColor(bgColor);
+        canvas.drawRect(bgRect, bgPaint);
+    }
+
+    //проверяем, что нажатие в области пазла
+    @Override
+    public boolean isItInBounds(Point startPoint) {
+        return startPoint.x < numberOfRects * rectSize && startPoint.y < numberOfRects * rectSize;
     }
 
     @Override
+    public boolean isWin() {
+        for (int i = 0; i < paints.length; i++) {
+            for (int j = 0; j < paints[0].length; j++) {
+                if (!(paints[i][j].getColor() == paintsToWin[i][j].getColor())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void setColors(int puzzleIndex) {
+        setColorsToPaintsToWin(puzzleIndex);
+        setColorsToPaints(puzzleIndex);
+        setColorsToMovesPaints();
+    }
+
+    //задаем правильные цвета для проверки на победу и для подсказки
+    @Override
+    public void setColorsToPaintsToWin(int index) {
+        int[][] colors = ColorSets.getPuzzle(index);
+        for (int i = 0; i < paintsToWin.length; i++) {
+            for (int j = 0; j < paintsToWin[i].length; j++) {
+                paintsToWin[i][j].setColor(colors[i][j]);
+            }
+        }
+    }
+
+    //задаем перемешанные цвета для пазла
+    @Override
     public void setColorsToPaints(int index) {
-//        int[][] colors = GradientGenerator.fourColors(numberOfRects, topLeftColor, topRightColor, bottomRightColor, bottomLeftColor);
-        int[][] colors = mixPuzzle(index);
+        int[][] colors = mixPuzzle(index, 1); //rotate 1 time
         for (int i = 0; i < paints.length; i++) {
             for (int j = 0; j < paints[i].length; j++) {
                 paints[i][j].setColor(colors[i][j]);
@@ -360,6 +441,18 @@ public class PlayActivityPresenter implements PlayGround {
         }
     }
 
+    //задаем цвета для ходов
+    @Override
+    public void setColorsToMovesPaints() {
+        int[][] colors = ColorSets.getPuzzle(1000);
+        for (int i = 0; i < movesPaints.length; i++) {
+            for (int j = 0; j < movesPaints[i].length; j++) {
+                movesPaints[i][j].setColor(colors[i][j]);
+            }
+        }
+    }
+
+    //наконец, когда у всех прямоугольников есть координаты и цвет, рисуем все прямоугольники
     @Override
     public void drawRects(Canvas canvas) {
         //рисуем все прямоугольники из изначального массива
@@ -374,41 +467,10 @@ public class PlayActivityPresenter implements PlayGround {
                 canvas.drawRect(rectsToRotate[i], paintsToRotate[i]);
             }
         }
-    }
-
-    @Override
-    public void drawFrame(Canvas canvas) {
-        Log.v(TAG, "drawFrame");
-        Rect frameBottomRect = new Rect(0, numberOfRects * rectSize, dSize.x, dSize.y);
-        Paint framePaint = new Paint();
-        framePaint.setColor(0xffffffff);
-        canvas.drawRect(frameBottomRect, framePaint);
-    }
-
-    @Override
-    public void drawBackground(Canvas canvas) {
-        Log.v(TAG, "drawBG");
-        Rect bgRect = new Rect(0, 0, dSize.x, dSize.y);
-        Paint bgPaint = new Paint();
-        bgPaint.setColor(bgColor);
-        canvas.drawRect(bgRect, bgPaint);
-    }
-
-    @Override
-    public boolean isItInBounds(Point startPoint) {
-        return startPoint.x < numberOfRects * rectSize && startPoint.y < numberOfRects * rectSize;
-    }
-
-    @Override
-    public boolean isWin() {
-//        return Arrays.deepEquals(paints, paintsToWin);
-        for (int i = 0; i < paints.length; i++) {
-            for (int j = 0; j < paints[0].length; j++) {
-                if (!(paints[i][j].getColor() == paintsToWin[i][j].getColor())) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        //рисуем рамку, чтобы не торчало
+        drawFrame(canvas);
+        //рисуем подсказку
+        hintRects.drawRects(canvas, paintsToWin);
+        movesRects.drawRects(canvas, movesPaints, movesMade);
     }
 }

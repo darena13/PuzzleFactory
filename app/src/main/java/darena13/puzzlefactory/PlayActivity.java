@@ -18,7 +18,6 @@ public class PlayActivity extends AppCompatActivity {
     private static final String TAG = "COLORLOVERS Main";
     PlayActivityPresenter presenter;
     int puzzleIndex; //получим из интента
-    DialogFragment winDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,12 +39,8 @@ public class PlayActivity extends AppCompatActivity {
         final DrawView drawView = new DrawView(this);
         setContentView(drawView);
 
-        winDialog = new WinDialog();
-
         //TODO: добавить кнопку "сбросить"
-        //TODO: добавить подсчет ходов
-        presenter.setPaintsToWin(puzzleIndex);
-        presenter.setColorsToPaints(puzzleIndex);
+        presenter.setColors(puzzleIndex);
         presenter.setXYToRects();
     }
 
@@ -62,7 +57,6 @@ public class PlayActivity extends AppCompatActivity {
             canvas.drawColor(Color.BLACK);
             presenter.drawBackground(canvas);
             presenter.drawRects(canvas);
-            presenter.drawFrame(canvas);
         }
 
         @Override
@@ -118,7 +112,6 @@ public class PlayActivity extends AppCompatActivity {
                         Intent intent = new Intent(PlayActivity.this, WinActivity.class);
                         intent.putExtra("PUZZLE", puzzleIndex);
                         startActivity(intent);
-                        //TODO: няшную анимацию - пусть там котик с радугой пролетает или чё
                         //TODO: показывать результат (ходов) и насколько это круто
                         //TODO: фиксируем, что пазл собран (в активити с уровнями это будет видно)
                     }

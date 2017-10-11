@@ -49,6 +49,7 @@ public class WinActivity extends AppCompatActivity {
             canvas.drawColor(Color.BLACK);
             presenter.drawBackground(canvas);
             presenter.drawText(canvas);
+            //TODO: няшную анимацию - пусть там котик с радугой пролетает или чё
 
 //            presenter.drawRects(canvas);
 //            presenter.drawFrame(canvas);

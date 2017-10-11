@@ -60,6 +60,16 @@ public class ColorSets {
             {0xffFF8469, 0xffFCEEE5, 0xffFCEEE5, 0xff8C2D64, 0xffFCEEE5, 0xffFCEEE5, 0xffFF8469}
     };
 
+    private final static int[][] puzzle_1000 = {
+            {0xff69D0FF},
+            {0xff8C2D64},
+            {0xffEB508C},
+            {0xffFF8469},
+            {0xffF5AD4F},
+            {0xff91CC85},
+            {0xff2B9E78}
+    };
+
     private static SparseArray<int[][]> map = new SparseArray<>();
 
     static {
@@ -68,6 +78,7 @@ public class ColorSets {
         map.put(2, ColorSets.puzzle_2);
         map.put(3, ColorSets.puzzle_3);
         map.put(4, ColorSets.puzzle_4);
+        map.put(1000, ColorSets.puzzle_1000);
     }
 
     public static int[][] getPuzzle(int index) {

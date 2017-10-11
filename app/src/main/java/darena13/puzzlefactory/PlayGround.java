@@ -15,8 +15,8 @@ public interface PlayGround {
     void vChoseLineToRotate(Point startPoint);
     void hPutRectsInPlaces(Point startPoint);
     void vPutRectsInPlace(Point startPoint);
-    void setPaintsToWin(int index);
-    int[][] mixPuzzle(int index);
+    void setColorsToPaintsToWin(int index);
+    int[][] mixPuzzle(int index, int times);
     void setColorsToPaints(int index);
     void setXYToRects();
     void drawRects(Canvas canvas);
@@ -24,4 +24,6 @@ public interface PlayGround {
     void drawBackground(Canvas canvas);
     boolean isItInBounds(Point startPoint);
     boolean isWin();
+    void setColorsToMovesPaints();
+    void setColors(int puzzleIndex);
 }

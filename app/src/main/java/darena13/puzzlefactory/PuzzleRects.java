@@ -1,5 +1,7 @@
 package darena13.puzzlefactory;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 
@@ -9,33 +11,23 @@ import android.graphics.Rect;
 
 public class PuzzleRects {
     private Rect[][] rects;
-    private Point topRight;
-    private Point topLeft;
-    private Point bottomRight;
-    private Point bottomLeft;
-    private int top;
-    private int bottom;
 
-    public PuzzleRects(int numberOfRects) {
-        rects = new Rect[numberOfRects][numberOfRects];
+    public PuzzleRects(int vNumberOfRects, int hNumberOfRects) {
+        rects = new Rect[vNumberOfRects][hNumberOfRects];
     }
 
     public Rect[][] getRects() {
         return rects;
     }
 
-    public void setRects(Rect[][] rects) {
-        this.rects = rects;
-    }
-
-    public void setXY(int rectSize, int puzzleSize, int vOffset, int hOffset) {
+    public void setXY(int rectSize, int vPuzzleSizeShift, int hPuzzleSizeShift, int vOffset, int hOffset) {
         for (int i = 0; i < rects.length; i++) {
             for (int j = 0; j < rects[i].length; j++) {
                 rects[i][j] = new Rect(
-                        j * rectSize + hOffset, //left
-                        i * rectSize + puzzleSize + vOffset, // top
-                        j * rectSize + rectSize + hOffset, // right
-                        i * rectSize + rectSize + puzzleSize + vOffset); // bottom
+                        j * rectSize + hPuzzleSizeShift + hOffset, //left
+                        i * rectSize + vPuzzleSizeShift + vOffset, // top
+                        j * rectSize + rectSize + hPuzzleSizeShift + hOffset, // right
+                        i * rectSize + rectSize + vPuzzleSizeShift + vOffset); // bottom
             }
         }
     }
@@ -59,4 +51,27 @@ public class PuzzleRects {
             }
         }
     }
+
+    void drawRects(Canvas canvas, Paint[][] paints) {
+        for (int i = 0; i < rects.length; i++) {
+            for (int j = 0; j < rects[i].length; j++) {
+                canvas.drawRect(rects[i][j], paints[i][j]);
+            }
+        }
+    }
+
+    void drawRects(Canvas canvas, Paint[][] paints, int movesMade) {
+        int vIndex;
+        if (movesMade >= rects.length) {
+            vIndex = 0;
+        } else {
+            vIndex = rects.length - movesMade;
+        }
+        for (int i = rects.length - 1; i >= vIndex; i--) {
+            for (int j = 0; j < rects[i].length; j++) {
+                canvas.drawRect(rects[i][j], paints[i][j]);
+            }
+        }
+    }
+
 }

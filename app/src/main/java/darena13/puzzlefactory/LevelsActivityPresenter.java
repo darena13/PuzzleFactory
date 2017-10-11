@@ -49,7 +49,7 @@ public class LevelsActivityPresenter implements Levels {
         levelsRects = new PuzzleRects[levelsNumber];
 
         for (int i = 0; i < levelsRects.length; i++) {
-            levelsRects[i] = new PuzzleRects(numberOfRects);
+            levelsRects[i] = new PuzzleRects(numberOfRects, numberOfRects);
         }
 
         levelsPaints = new Paint[levelsNumber][numberOfRects][numberOfRects];
@@ -100,7 +100,7 @@ public class LevelsActivityPresenter implements Levels {
 //            }
 //        }
         for (int k = 0; k < levelsRects.length; k++) {
-            levelsRects[k].setXY(rectSize, numberOfRects * rectSize * k, vOffset * (k + 1), hOffset);
+            levelsRects[k].setXY(rectSize, numberOfRects * rectSize * k, 0, vOffset * (k + 1), hOffset);
         }
     }
 
