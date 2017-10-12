@@ -87,20 +87,10 @@ public class LevelsActivityPresenter implements Levels {
 
     //задаем координаты прямоугольников
     @Override
-    public void setXYToRects() {
-//        for (int k = 0; k < levelsRects.length; k++) {
-//            for (int i = 0; i < levelsRects[k].length; i++) {
-//                for (int j = 0; j < levelsRects[k][i].length; j++) {
-//                    levelsRects[k][i][j] = new Rect(
-//                            j * rectSize + hOffset, //left
-//                            i * rectSize + numberOfRects * rectSize * k + vOffset * (k + 1), // top
-//                            j * rectSize + rectSize + hOffset, // right
-//                            i * rectSize + rectSize + numberOfRects * rectSize * k + vOffset * (k + 1)); // bottom
-//                }
-//            }
-//        }
+    public void setXYToRects(int puzzleIndex) {
+        int shift = numberOfRects * rectSize * (puzzleIndex) + vOffset * (puzzleIndex);
         for (int k = 0; k < levelsRects.length; k++) {
-            levelsRects[k].setXY(rectSize, numberOfRects * rectSize * k, 0, vOffset * (k + 1), hOffset);
+            levelsRects[k].setXY(rectSize, vOffset * (k + 1) + numberOfRects * rectSize * k - shift, hOffset);
         }
     }
 

@@ -27,6 +27,12 @@ public class LevelsActivity extends AppCompatActivity {
 
         presenter = new LevelsActivityPresenter(getApplicationContext());
 
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle != null){
+            puzzleIndex = bundle.getInt("PUZZLE");
+        }
+
         final LevelsActivity.DrawView drawView = new LevelsActivity.DrawView(this);
         setContentView(drawView);
     }
@@ -39,9 +45,8 @@ public class LevelsActivity extends AppCompatActivity {
 
         public DrawView(Context context) {
             super(context);
-
             presenter.setColorsToLevelsPaints();
-            presenter.setXYToRects();
+            presenter.setXYToRects(puzzleIndex); //передать смещение на нужный пазл
         }
 
         @Override
@@ -69,6 +74,7 @@ public class LevelsActivity extends AppCompatActivity {
                     break;
                 case MotionEvent.ACTION_UP:
                     //посчитать какой пазл поставить наверх и поставить (?)
+
                     //проверить не было ли нажатия и перейти к выбранному пазлу
                     int selectedPuzzle;
                     if (Math.abs(startPointY - eventY) < 20 & (System.currentTimeMillis() - startTime) < 500) {

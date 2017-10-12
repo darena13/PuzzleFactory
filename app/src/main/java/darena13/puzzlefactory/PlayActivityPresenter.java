@@ -271,9 +271,9 @@ public class PlayActivityPresenter implements PlayGround {
     //задаем координаты прямоугольников
     @Override
     public void setXYToRects() {
-        pictureRects.setXY(rectSize, 0, 0, topMargin, 0);
-        hintRects.setXY(hintRectSize, 0, 0, rectSize, hintRectSize * 2);
-        movesRects.setXY(hintRectSize, 0, 0, rectSize * 2,  hintRectSize * (numberOfRects + 4));
+        pictureRects.setXY(rectSize, topMargin, 0);
+        hintRects.setXY(hintRectSize, rectSize, hintRectSize * 2);
+        movesRects.setXY(hintRectSize, rectSize * 2,  hintRectSize * (numberOfRects + 4));
         redReset = new Rect(
                 hintRectSize * (numberOfRects + 3),
                 hintRectSize * 4,

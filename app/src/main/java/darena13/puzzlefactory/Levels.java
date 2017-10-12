@@ -11,7 +11,10 @@ public interface Levels {
     void leafOver(Point startPoint, int eventX);
     int choseLevel(Point event);
     void drawBackground(Canvas canvas);
-    void setXYToRects();
+
+    //задаем координаты прямоугольников
+    void setXYToRects(int puzzleIndex);
+
     void setColorsToLevelsPaints();
     void drawRects(Canvas canvas);
     void moveAll(int distY);

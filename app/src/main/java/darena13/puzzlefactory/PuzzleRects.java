@@ -19,14 +19,14 @@ public class PuzzleRects {
         return rects;
     }
 
-    public void setXY(int rectSize, int vPuzzleSizeShift, int hPuzzleSizeShift, int vOffset, int hOffset) {
+    public void setXY(int rectSize, int vOffset, int hOffset) {
         for (int i = 0; i < rects.length; i++) {
             for (int j = 0; j < rects[i].length; j++) {
                 rects[i][j] = new Rect(
-                        j * rectSize + hPuzzleSizeShift + hOffset, //left
-                        i * rectSize + vPuzzleSizeShift + vOffset, // top
-                        j * rectSize + rectSize + hPuzzleSizeShift + hOffset, // right
-                        i * rectSize + rectSize + vPuzzleSizeShift + vOffset); // bottom
+                        j * rectSize + hOffset, //left
+                        i * rectSize + vOffset, // top
+                        j * rectSize + rectSize + hOffset, // right
+                        i * rectSize + rectSize + vOffset); // bottom
             }
         }
     }
@@ -146,6 +146,5 @@ public class PuzzleRects {
                     rects[i - (numberOfRects * 2)][xIndex].bottom + numberOfRects * rectSize
             );
         }
-
     }
 }
